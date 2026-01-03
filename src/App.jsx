@@ -5,6 +5,7 @@ import axios from 'axios';
 import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './assets/style.css'; 
+
 const API_BASE = "https://ec-course-api.hexschool.io/v2"
 
 // 請自行替換 API_PATH
@@ -20,6 +21,24 @@ function App() {
   const [products, setProducts] = React.useState([]);
   const [tempProduct, setTempProduct] = React.useState(null);
 
+  //檢查是否登入
+  async function checkLogin() {
+    try {
+      const token = document.cookie
+      .split(";")
+      .find((row) => row.startsWith("hexToken="))
+      ?.split("=")[1];
+      console.log(token);
+      axios.defaults.headers.common.Authorization = token;
+
+      const res = await axios.post(`${API_BASE}/api/user/check`);
+      console.log(res);
+    } catch (error) 
+      {
+        console.log("尚未登入或登入已過期",error);
+      }
+  }
+  
   const handleInputChange = (e) => {
     e.preventDefault();
     const {id,value} = e.target;
@@ -67,6 +86,14 @@ function App() {
         <div className="container">
           <div className="row mt-5">
             <div className="col-md-6">
+              <button
+              className="btn btn-danger mb-5"
+              type="button"
+              id="check"
+              onClick={checkLogin}
+              >
+                確認是否登入
+              </button>
               <h2>產品列表</h2>
               <table className="table">
                 <thead>
@@ -196,4 +223,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
