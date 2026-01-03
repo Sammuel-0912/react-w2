@@ -38,7 +38,7 @@ function App() {
         console.log("尚未登入或登入已過期",error);
       }
   }
-  
+
   const handleInputChange = (e) => {
     e.preventDefault();
     const {id,value} = e.target;
@@ -78,7 +78,27 @@ function App() {
     }
   };
 
+  //優化:進入頁面時檢查有無Cookie，有的話自動驗證
+  React.useEffect(() => {
+    const token = document.cookie
+      .split(";")
+      .find((row) => row.startsWith("hexToken="))
+      ?.split("=")[1];
 
+      if(token) {
+        axios.defaults.headers.common["Authorization"] = token;
+        //呼叫檢查登入API
+        axios.post(`${API_BASE}/api/user/check`)
+        .then(() => {
+          setIsAuth(true);
+          //取得產品列表
+          getData();
+        })
+        .catch(() => {
+          setIsAuth(false);
+        });
+      }
+  },[]);
 
   return (
     <>
